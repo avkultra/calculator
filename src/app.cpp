@@ -32,6 +32,7 @@ namespace
 	    {"val1", required_argument, 0, 'a'},
 	    {"operation", required_argument, 0, 'o'},
 	    {"val2", required_argument, 0, 'b'},
+	    {"factorial", required_argument, 0, 'f'},
 	    {"help", no_argument, 0, 'h'},
 	    {0, 0, 0, 0}
 	};
@@ -41,7 +42,7 @@ namespace
 
 	optind = 1;
 
-	    while ((opt = getopt_long(argc, argv, "a:o:b:h", long_options, NULL)) != -1)
+	    while ((opt = getopt_long(argc, argv, "a:o:b:f:h", long_options, NULL)) != -1)
 	    {
 		switch (opt)
 		{
@@ -75,10 +76,13 @@ namespace
 			<< "  -a, --val1 <num>       First operand\n"
 			<< "  -o, --operation <op>   Operation (+, -, *, /, %)\n"
 			<< "  -b, --val2 <num>       Second operand\n"
+			<< "  -f, --factorial <num>  Calculate factorial (unary operation)\n"
 			<< "  -h, --help             Show this help\n"
 			<< "\nExample:\n"
-			<< "  " << argv[0] << " -a 10 -b + -c 5\n"
-			<< "  " << argv[0] << " --a 20 --operation '*' --b 3" << std::endl;
+			<< "  " << argv[0] << " -a 10 -o + -b 5\n"
+			<< "  " << argv[0] << " --a 20 --operation '*' --b 3"
+			<< "  " << argv[0] << " -f 5                    (factorial: 5!)\n"
+			<< "  " << argv[0] << " --factorial 7           (factorial: 7!)" << std::endl;
 		     exit(0);
 		}
 	    }
@@ -104,6 +108,15 @@ namespace
 			break;
 		    case '^':
 			cmd.result = libmath::power(cmd.val1, cmd.val2);
+			break;
+		    case '!':
+
+			if (cmd.val1 < 0)
+			{
+			    cmd.status = S_FALSE;
+			    return;
+			}
+			cmd.result = libmath::factorial(cmd.val1);
 			break;
 		    default:
 			cmd.status = S_FALSE;
