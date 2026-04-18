@@ -56,9 +56,9 @@ namespace
 
 			// Проверка допустимых операций
 			if (op != '+' && op != '-' && op != '*' &&
-			    op != '/' && op != '^')
+			    op != '/' && op != '^' && op != '!')
 			{
-			    std::cout << ("Error: Invalid operation. Use +, -, *, /, or ^\n") << std::endl;
+			    std::cout << ("Error: Invalid operation. Use +, -, *, /, ! or ^\n") << std::endl;
 			    exit(1);
 			}
 
@@ -66,6 +66,10 @@ namespace
 			has_operation = true;
 		    }
 		    break;
+		case 'f':
+			cmd.val1 = atoi(optarg);
+			cmd.operation = '!';
+			break;
 		case 'b':
 			cmd.val2 = atoi(optarg);
 			has_val2 = true;
@@ -80,7 +84,7 @@ namespace
 			<< "  -h, --help             Show this help\n"
 			<< "\nExample:\n"
 			<< "  " << argv[0] << " -a 10 -o + -b 5\n"
-			<< "  " << argv[0] << " --a 20 --operation '*' --b 3"
+			<< "  " << argv[0] << " --a 20 --operation '*' --b 3\n"
 			<< "  " << argv[0] << " -f 5                    (factorial: 5!)\n"
 			<< "  " << argv[0] << " --factorial 7           (factorial: 7!)" << std::endl;
 		     exit(0);
@@ -125,10 +129,17 @@ namespace
 
     void output(const Cmd& cmd)
     {
-	    if (cmd.status == S_OK)
-	    {
-		std::cout << cmd.val1 << ' ' << cmd.operation << ' ' << cmd.val2 << " = " << cmd.result << '\n';
-	    }
+	if (cmd.status == S_OK)
+	   {
+	       if (cmd.operation == '!')
+	       {
+		   std::cout << cmd.val1 << "! = " << cmd.result << '\n';
+	       }
+	       else
+	       {
+		   std::cout << cmd.val1 << ' ' << cmd.operation << ' ' << cmd.val2 << " = " << cmd.result << '\n';
+	       }
+	   }
 	    else if (cmd.status == S_FALSE)
 	    {
 		std::cout << "Error!\n";
