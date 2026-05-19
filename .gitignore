@@ -42,3 +42,42 @@
 
 #
 /build
+
+# Папки сборки
+build/
+tests/build/
+*/build/
+
+# Файлы Qt Creator
+*.user
+*.qtc/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Build directories
+_depts/
+_deps/
+
+# IDE files
+.vscode/
+.idea/
+
+# Compiled files
+*.o
+*.so
+*.a
+*.exe
+*.out
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

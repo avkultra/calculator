@@ -1,6 +1,7 @@
 #include "app.h"
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
-  app::run(argc, argv);
+    app::CApplication app;
+    return app.run(argc, argv);
 }

@@ -2,5 +2,10 @@
 
 namespace app
 {
-    void run(int argc, char** argv);
+    class CApplication
+    {
+      public:
+        int run(int argc, char* argv[]);
+    };
+
 }
