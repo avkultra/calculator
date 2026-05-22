@@ -7,9 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(BUILD_TESTS "Build unit tests" ON)
-option(ENABLE_CLANG_FORMAT "Enable clang-format" ON)
-option(ENABLE_CLANG_TIDY "Enable clang-tidy" ON)
+option(ENABLE_CLANG_FORMAT "Enable clang-format" OFF)
+option(ENABLE_CLANG_TIDY "Enable clang-tidy" OFF)
 
+include_directories(/usr/local/include)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 include(FetchContent)
@@ -44,7 +45,7 @@ add_executable(calculator
     src/logger.cpp
     src/command_parser.cpp
     src/calculator.cpp
-    src/app.h
+    include/app.h
     include/command_parser.h
     include/logger.h
     include/calculator.h
@@ -73,7 +74,7 @@ add_custom_target(calculator-format
     COMMENT "Running clang-format on calculator project"
 )
 
-   add_dependencies(math clang-format-target)
+  add_dependencies(math clang-format-target)
 endif()
 
 

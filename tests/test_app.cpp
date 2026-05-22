@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/app.h"
+#include "../include/app.h"
 #include <string>
 
 class AppTest : public ::testing::Test
