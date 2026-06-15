@@ -7,12 +7,9 @@
 #include "calculator.h"
 #include "logger.h"
 
-
-
 namespace app
 {
-
-class COutputWriter
+    class COutputWriter
     {
       public:
         void writeInt(int num)

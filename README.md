@@ -2,20 +2,20 @@
 
 ### Примеры использования
 # Сложение
-./calculator -a 15 -o + -b 25
+./calculator '{"operation":"+","operand1":15,"operand2":25}'
 
 # Вычитание
-./calculator -a 100 -o - -b 45
+./calculator '{"operation":"-","operand1":100,"operand2":45}'
 
 # Умножение
-./calculator -a 12 -o '*' -b 11
+./calculator '{"operation":"*","operand1":12,"operand2":11}'
 
 # Деление
-./calculator -a 144 -o / -b 12
+./calculator '{"operation":"/","operand1":144,"operand2":12}'
 
 # Возведение в степень
-./calculator -a 3 -o '^' -b 4
+./calculator '{"operation":"^","operand1":3,"operand2":4}'
 
 # Факториал
-./calculator -f 5 
+./calculator '{"operation":"!","operand":5}'
 
