@@ -1,18 +1,8 @@
-find_path(POSTGRES_INCLUDE_DIR
-    NAMES libpq-fe.h
-    PATHS /usr/include/postgresql /usr/include
-)
-
-find_library(POSTGRES_LIBRARY
-    NAMES pq
-    PATHS /usr/lib/x86_64-linux-gnu /usr/lib
-)
-
+find_path(POSTGRES_INCLUDE_DIR ...)
+find_library(POSTGRES_LIBRARY ...)
 if(POSTGRES_INCLUDE_DIR AND POSTGRES_LIBRARY)
-    message(STATUS "Tests: Found PostgreSQL: ${POSTGRES_INCLUDE_DIR}")
     set(HAVE_POSTGRES ON)
 else()
-    message(WARNING "Tests: PostgreSQL not found")
     set(HAVE_POSTGRES OFF)
 endif()
 
@@ -33,7 +23,6 @@ set(TEST_SOURCES
 
 add_executable(calculator_tests ${TEST_SOURCES})
 
-# Базовые библиотеки
 target_link_libraries(calculator_tests
     PRIVATE
         math
@@ -44,7 +33,6 @@ target_link_libraries(calculator_tests
 
 if(HAVE_POSTGRES)
     target_link_libraries(calculator_tests PRIVATE ${POSTGRES_LIBRARY})
-    target_include_directories(calculator_tests PRIVATE ${POSTGRES_INCLUDE_DIR})
 endif()
 
 target_include_directories(calculator_tests
@@ -52,5 +40,9 @@ target_include_directories(calculator_tests
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_BINARY_DIR}/_deps/googletest-src/googletest/include
 )
+
+# Тестовый клиент
+add_executable(test_client test_client.cpp)
+target_link_libraries(test_client PRIVATE Boost::system)
 
 add_test(NAME calculator_tests COMMAND calculator_tests)

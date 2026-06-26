@@ -37,12 +37,14 @@ namespace app
 
     void CCalculationCache::put(const std::string& key, int result, int status)
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_cache[key] = {result, status};
         CLogger::getInstance().debug("Cache put: " + key + " = " + std::to_string(result) + " (status: " + std::to_string(status) + ")");
     }
 
     std::optional<std::pair<int, int>> CCalculationCache::get(const std::string& key)
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
         auto it = m_cache.find(key);
         if (it != m_cache.end())
         {
@@ -55,22 +57,26 @@ namespace app
 
     bool CCalculationCache::contains(const std::string& key)
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_cache.find(key) != m_cache.end();
     }
 
     void CCalculationCache::clear()
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_cache.clear();
         CLogger::getInstance().info("Cache cleared");
     }
 
     size_t CCalculationCache::size() const
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_cache.size();
     }
 
     void CCalculationCache::warmup()
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
         CLogger::getInstance().info("Warming up cache from database...");
 
         auto& db = CDatabaseManager::getInstance();
@@ -100,5 +106,4 @@ namespace app
 
         CLogger::getInstance().info("Cache warmup complete. Loaded " + std::to_string(m_cache.size()) + " entries");
     }
-
 }

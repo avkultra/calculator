@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-
+#include <mutex>
 #include <memory>
 
 namespace app
@@ -45,6 +45,7 @@ namespace app
 
         std::unique_ptr<CDatabaseConnection> m_conn;
         bool m_initialized = false;
+        std::mutex m_db_mutex;
     };
 
 }

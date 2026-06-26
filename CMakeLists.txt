@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(calculator VERSION 1.3.0)
+project(calculator VERSION 1.4.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,6 +9,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(BUILD_TESTS "Build unit tests" ON)
 option(ENABLE_CLANG_FORMAT "Enable clang-format" ON)
 option(ENABLE_CLANG_TIDY "Enable clang-tidy" ON)
+
+find_package(Boost REQUIRED COMPONENTS system)
+find_package(Threads REQUIRED)
 
 # ПОИСК POSTGRESQL
 find_path(POSTGRES_INCLUDE_DIR
@@ -74,6 +77,8 @@ add_executable(calculator
     src/DB/databaseresult.cpp
     src/DB/databasestatement.cpp
     src/DB/databasemanager.cpp
+    src/server.cpp
+    calculator.service
 )
 
 target_link_libraries(calculator
@@ -81,9 +86,11 @@ target_link_libraries(calculator
         math
         spdlog::spdlog
         nlohmann_json::nlohmann_json
+        Boost::system
+        Threads::Threads
 )
 
-# PostgreSQL линковка (тоже ПОСЛЕ создания таргета)
+# PostgreSQL линковка
 if(HAVE_POSTGRES)
     target_link_libraries(calculator PRIVATE ${POSTGRES_LIBRARY})
 endif()
@@ -110,6 +117,29 @@ install(TARGETS calculator
     RUNTIME DESTINATION /usr/local/bin
 )
 
+# Установка systemd unit
+install(FILES ${CMAKE_SOURCE_DIR}/calculator.service
+    DESTINATION /etc/systemd/system)
+install(FILES calculator.service DESTINATION /etc/systemd/system)
+
+
+# CPack для deb-пакета
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "calculator-service")
+set(CPACK_PACKAGE_VERSION "1.4.0")
+set(CPACK_PACKAGE_DESCRIPTION "Calculator service")
+set(CPACK_PACKAGE_VENDOR "avkultra")
+set(CPACK_PACKAGE_CONTACT "avk_job@mail.ru")
+set(CPACK_PACKAGE_HOMEPAGE "https://github.com/avkultra/calculator")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "avkultra <avk_job@mail.ru>")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libpq5, postgresql, libboost-system-dev, libboost-thread-dev")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
+
+
+include(CPack)
+
 # TESTS
 if(BUILD_TESTS)
     enable_testing()
@@ -121,4 +151,12 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     add_subdirectory(tests)
+endif()
+
+option(ENABLE_THREAD_SANITIZER OFF)
+
+if(ENABLE_THREAD_SANITIZER)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=thread -g -O1")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=thread")
+    message(STATUS "ThreadSanitizer enabled")
 endif()

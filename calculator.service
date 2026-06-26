@@ -1,0 +1,15 @@
+[Unit]
+Description=Calculator Service
+After=network.target postgresql.service
+
+[Service]
+ExecStart=/usr/bin/calculator
+Type=simple
+Restart=always
+User=calculator
+Group=calculator
+Environment="PGPASSWORD=0"
+WorkingDirectory=/var/lib/calculator
+
+[Install]
+WantedBy=multi-user.target
