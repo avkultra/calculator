@@ -321,5 +321,4 @@ namespace app
             db.insertFactorial(operand, result, status);
         }
     }
-
 }

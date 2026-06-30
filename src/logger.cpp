@@ -4,7 +4,6 @@
 
 namespace app
 {
-
     class CLogger::Impl
     {
       public:
@@ -48,5 +47,4 @@ namespace app
     {
         m_upImpl->logger->debug(message);
     }
-
 }

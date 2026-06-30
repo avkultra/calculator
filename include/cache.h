@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <optional>
+#include <mutex>
 
 namespace app
 {
@@ -39,6 +40,7 @@ namespace app
 
         std::unordered_map<std::string, CacheEntry> m_cache;
         static bool isCommutative(char operation);
+        mutable std::mutex m_mutex;
     };
 
 }

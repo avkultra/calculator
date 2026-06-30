@@ -57,6 +57,7 @@ namespace app
 
     bool CDatabaseManager::insertOperation(int operand1, int operand2, char operation, int result, int status)
     {
+        std::lock_guard<std::mutex> lock(m_db_mutex);
         if (!isInitialized())
             return false;
 
@@ -82,11 +83,13 @@ namespace app
 
     bool CDatabaseManager::insertFactorial(int operand, int result, int status)
     {
+        std::lock_guard<std::mutex> lock(m_db_mutex);
         return insertOperation(operand, 0, '!', result, status);
     }
 
     std::vector<CDatabaseManager::TOperationRecord> CDatabaseManager::getAllOperations()
     {
+        std::lock_guard<std::mutex> lock(m_db_mutex);
         std::vector<TOperationRecord> records;
         if (!isInitialized()) return records;
 

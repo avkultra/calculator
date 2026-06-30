@@ -1,39 +1,64 @@
-#include "app.h"
+#include "server.h"
 #include "DB/databasemanager.h"
 #include "cache.h"
 #include "logger.h"
 #include <iostream>
+#include <thread>
+#include <atomic>
+#include <signal.h>
+#include <chrono>
+
+std::atomic<bool> g_running{true};
 
 int main(int argc, char* argv[])
 {
     try
     {
-        // Инициализация логгера
         auto& logger = app::CLogger::getInstance();
-        logger.info("Application starting...");
+        logger.info("Service starting...");
 
-        // Инициализация базы данных
+        // Инициализация БД и прогреваем ке
         auto& db = app::CDatabaseManager::getInstance();
         if (!db.initialize("dbname=calculator_db user=calculator password=0 host=localhost"))
         {
             logger.warn("Database not available, continuing without persistence");
         }
 
-        // Прогрев кеша из базы данных
         if (db.isInitialized())
         {
             app::CCalculationCache::getInstance().warmup();
             logger.info("Cache warmed up from database");
         }
 
-        // Запуск основного приложения
-        app::CApplication app;
-        int result = app.run(argc, argv);
+        // Блокируем сигналы в главном потоке
+        sigset_t set;
+        sigemptyset(&set);
+        sigaddset(&set, SIGTERM);
+        sigaddset(&set, SIGINT);
+        sigaddset(&set, SIGHUP);  // для перезагрузки
+        pthread_sigmask(SIG_BLOCK, &set, nullptr);
 
-        // Вывод статистики кеша
-        logger.info("Cache size at exit: " + std::to_string(app::CCalculationCache::getInstance().size()));
+        // Запускаем сервер в отдельном потоке
+        app::CServer server(8080);
+        std::thread server_thread([&server]() {
+            server.run(g_running);
+        });
 
-        return result;
+        // Главный поток ждёт сигналы
+        int sig;
+        sigwait(&set, &sig);
+        logger.info("Received signal " + std::to_string(sig) + ", shutting down...");
+
+        // Останавливаем сервер
+        g_running = false;
+        server.stop();
+
+        // Ждём завершения серверного потока
+        if (server_thread.joinable())
+            server_thread.join();
+
+        logger.info("Service stopped");
+        return 0;
     }
     catch (const std::exception& e)
     {
